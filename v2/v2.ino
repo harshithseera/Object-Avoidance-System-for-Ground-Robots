@@ -43,10 +43,10 @@ void update_encoder_right() {
 
 void initialize_motors() {
     leftMotor.EncoderPinA = 2;
-    leftMotor.EncoderPinB = 3;
-    leftMotor.ForwardPin = 4;
+    leftMotor.EncoderPinB = 4;
+    leftMotor.ForwardPin = 16;
     leftMotor.BackwardPin = 5;
-    leftMotor.EnablePin = 6;
+    leftMotor.EnablePin = 17;
     leftMotor.EncoderValue = 0;
     attachInterrupt(digitalPinToInterrupt(leftMotor.EncoderPinA), update_encoder_left, RISING);
 
