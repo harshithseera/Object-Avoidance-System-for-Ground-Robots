@@ -45,13 +45,13 @@ void initialize_motors() {
     leftMotor.EncoderPinA = 2;
     leftMotor.EncoderPinB = 4;
     leftMotor.ForwardPin = 16;
-    leftMotor.BackwardPin = 5;
+    leftMotor.BackwardPin = 7;
     leftMotor.EnablePin = 17;
     leftMotor.EncoderValue = 0;
     attachInterrupt(digitalPinToInterrupt(leftMotor.EncoderPinA), update_encoder_left, RISING);
 
-    rightMotor.EncoderPinA = 7;
-    rightMotor.EncoderPinB = 8;
+    rightMotor.EncoderPinA = 5;
+    rightMotor.EncoderPinB = 18;
     rightMotor.ForwardPin = 9;
     rightMotor.BackwardPin = 10;
     rightMotor.EnablePin = 11;
