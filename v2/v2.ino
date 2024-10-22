@@ -1,13 +1,9 @@
 // Code for two motors, for robot that moves only back and front
-#define TRIG_FRONT 12
-#define ECHO_FRONT 13
-#define TRIG_BACK 14
-#define ECHO_BACK 15
+#define TRIG_FRONT 25
+#define ECHO_FRONT 26
+#define TRIG_BACK 32
+#define ECHO_BACK 33
 
-#define OUTPUT 1
-#define INPUT 0
-#define HIGH 1
-#define LOW 0
 #define MAX_DISTANCE 200
 #define DETECT 10
 
@@ -26,14 +22,14 @@ motor rightMotor;
 
 int dir = 1;
 
-void update_encoder_left() {
+void IRAM_ATTR update_encoder_left() {
     if(digitalRead(leftMotor.EncoderPinA) > digitalRead(leftMotor.EncoderPinB)) {
         leftMotor.EncoderValue++;
     } else {
         leftMotor.EncoderValue--;
     }
 }
-void update_encoder_right() {
+void IRAM_ATTR update_encoder_right() {
     if(digitalRead(rightMotor.EncoderPinA) > digitalRead(rightMotor.EncoderPinB)) {
         rightMotor.EncoderValue++;
     } else {
@@ -42,48 +38,53 @@ void update_encoder_right() {
 }
 
 void initialize_motors() {
-    leftMotor.EncoderPinA = 2;
-    leftMotor.EncoderPinB = 4;
-    leftMotor.ForwardPin = 16;
-    leftMotor.BackwardPin = 7;
-    leftMotor.EnablePin = 17;
+    leftMotor.EncoderPinA = 16; //C1
+    leftMotor.EncoderPinB = 4; //C2
+    leftMotor.ForwardPin = 22;
+    leftMotor.BackwardPin = 17;
+    leftMotor.EnablePin = 23;
     leftMotor.EncoderValue = 0;
     attachInterrupt(digitalPinToInterrupt(leftMotor.EncoderPinA), update_encoder_left, RISING);
 
-    rightMotor.EncoderPinA = 5;
-    rightMotor.EncoderPinB = 18;
-    rightMotor.ForwardPin = 9;
-    rightMotor.BackwardPin = 10;
-    rightMotor.EnablePin = 11;
+    rightMotor.EncoderPinA = 18;
+    rightMotor.EncoderPinB = 5;
+    rightMotor.ForwardPin = 21;
+    rightMotor.BackwardPin = 15;
+    rightMotor.EnablePin = 19;
     rightMotor.EncoderValue = 0;
     attachInterrupt(digitalPinToInterrupt(rightMotor.EncoderPinA), update_encoder_right, RISING);
 }
 
 void forward() {
-    digitalWrite(leftMotor.ForwardPin, HIGH);
-    digitalWrite(leftMotor.BackwardPin, LOW);
     digitalWrite(rightMotor.ForwardPin, HIGH);
     digitalWrite(rightMotor.BackwardPin, LOW);
-    analogWrite(leftMotor.EnablePin, 255);
     analogWrite(rightMotor.EnablePin, 255);
+    digitalWrite(leftMotor.ForwardPin, HIGH);
+    digitalWrite(leftMotor.BackwardPin, LOW);
+    analogWrite(leftMotor.EnablePin, 255);
 }
 
 void backward() {
-    digitalWrite(leftMotor.ForwardPin, LOW);
-    digitalWrite(leftMotor.BackwardPin, HIGH);
     digitalWrite(rightMotor.ForwardPin, LOW);
     digitalWrite(rightMotor.BackwardPin, HIGH);
-    analogWrite(leftMotor.EnablePin, 255);
     analogWrite(rightMotor.EnablePin, 255);
+    digitalWrite(leftMotor.ForwardPin, LOW);
+    digitalWrite(leftMotor.BackwardPin, HIGH);
+    analogWrite(leftMotor.EnablePin, 255);
 }
 
 void stopMotors() {
+    for(int i = 255; i > 0; i--) {
+        analogWrite(leftMotor.EnablePin, i);
+        analogWrite(rightMotor.EnablePin, i);
+        delay(10);
+    }
     digitalWrite(leftMotor.ForwardPin, LOW);
     digitalWrite(leftMotor.BackwardPin, LOW);
     digitalWrite(rightMotor.ForwardPin, LOW);
     digitalWrite(rightMotor.BackwardPin, LOW);
-    analogWrite(leftMotor.EnablePin, 0);
-    analogWrite(rightMotor.EnablePin, 0);
+    // analogWrite(leftMotor.EnablePin, 0);
+    // analogWrite(rightMotor.EnablePin, 0);
 }
 
 int getDistance(int trigPin, int echoPin) {
@@ -96,10 +97,10 @@ int getDistance(int trigPin, int echoPin) {
     long duration = pulseIn(echoPin, HIGH);
     int distance = duration * 0.034 / 2;
     return (distance == 0) ? MAX_DISTANCE : distance;
+    // return distance;
 }
 
 void setup() {
-    Serial.begin(9600);
     initialize_motors();
     pinMode(leftMotor.ForwardPin, OUTPUT);
     pinMode(leftMotor.BackwardPin, OUTPUT);
@@ -116,6 +117,8 @@ void setup() {
     pinMode(ECHO_FRONT, INPUT);
     pinMode(TRIG_BACK, OUTPUT);
     pinMode(ECHO_BACK, INPUT);
+
+    Serial.begin(115200);
 
     stopMotors();
     forward();
@@ -134,13 +137,15 @@ void loop() {
     if(dir == 1 && distanceFront < DETECT) {
         stopMotors();
         backward();
-        delay(1000);
+        // delay(1000);
         dir = -1;
     }
     if(dir == -1 && distanceBack < DETECT) {
         stopMotors();
         forward();
-        delay(1000);
+        // delay(1000);
         dir = 1;
     }
+
+    delay(1000);
 }
