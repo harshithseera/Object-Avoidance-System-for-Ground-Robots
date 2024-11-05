@@ -348,15 +348,15 @@ void loop() {
       stopMotors();
       backward();
       // delay(1000);
-      mqttPublish( channelID, (String("field1=")+String(dir)));
       dir = -1;
+      mqttPublish( channelID, (String("field1=")+String(dir)));
   }
   if(dir == -1 && distanceBack < DETECT) {
       stopMotors();
       forward();
       // delay(1000);
-      mqttPublish( channelID, (String("field1=")+String(dir)));
       dir = 1;
+      mqttPublish( channelID, (String("field1=")+String(dir)));
   }
 
   delay(1000);
