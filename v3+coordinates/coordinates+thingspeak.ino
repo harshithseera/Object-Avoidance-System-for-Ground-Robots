@@ -8,6 +8,10 @@
 #define ECHO_FRONT 26
 #define TRIG_BACK 32
 #define ECHO_BACK 33
+#define TRIG_LEFT 12
+#define ECHO_LEFT 13
+#define TRIG_RIGHT 34
+#define ECHO_RIGHT 35
 
 #define MAX_DISTANCE 200
 #define DETECT 10
@@ -368,62 +372,72 @@ int convert(String s)
 
 
 void setup() {
-  // put your setup code here, to run once:
-  Serial.begin( 115200 );
-  // Delay to allow serial monitor to come up.
-  delay(3000);
-  // Connect to Wi-Fi network.
-  connectWifi();
-  // Configure the MQTT client
-  mqttClient.setServer( server, mqttPort ); 
-  // Set the MQTT message handler function.
-  mqttClient.setCallback( mqttSubscriptionCallback );
-  // Set the buffer to handle the returned JSON. NOTE: A buffer overflow of the message buffer will result in your callback not being invoked.
-  mqttClient.setBufferSize( 2048 );
+    // put your setup code here, to run once:
+    Serial.begin( 115200 );
+    // Delay to allow serial monitor to come up.
+    delay(3000);
+    // Connect to Wi-Fi network.
+    connectWifi();
+    // Configure the MQTT client
+    mqttClient.setServer( server, mqttPort ); 
+    // Set the MQTT message handler function.
+    mqttClient.setCallback( mqttSubscriptionCallback );
+    // Set the buffer to handle the returned JSON. NOTE: A buffer overflow of the message buffer will result in your callback not being invoked.
+    mqttClient.setBufferSize( 2048 );
 
-  initialize_motors();
-  pinMode(leftMotor.ForwardPin, OUTPUT);
-  pinMode(leftMotor.BackwardPin, OUTPUT);
-  pinMode(leftMotor.EnablePin, OUTPUT);
-  pinMode(rightMotor.ForwardPin, OUTPUT);
-  pinMode(rightMotor.BackwardPin, OUTPUT);
-  pinMode(rightMotor.EnablePin, OUTPUT);
-  pinMode(leftMotor.EncoderPinA, INPUT);
-  pinMode(leftMotor.EncoderPinB, INPUT);
-  pinMode(rightMotor.EncoderPinA, INPUT);
-  pinMode(rightMotor.EncoderPinB, INPUT);
+    initialize_motors();
+    pinMode(leftMotor.ForwardPin, OUTPUT);
+    pinMode(leftMotor.BackwardPin, OUTPUT);
+    pinMode(leftMotor.EnablePin, OUTPUT);
+    pinMode(rightMotor.ForwardPin, OUTPUT);
+    pinMode(rightMotor.BackwardPin, OUTPUT);
+    pinMode(rightMotor.EnablePin, OUTPUT);
+    pinMode(leftMotor.EncoderPinA, INPUT);
+    pinMode(leftMotor.EncoderPinB, INPUT);
+    pinMode(rightMotor.EncoderPinA, INPUT);
+    pinMode(rightMotor.EncoderPinB, INPUT);
 
-  pinMode(TRIG_FRONT, OUTPUT);
-  pinMode(ECHO_FRONT, INPUT);
-  pinMode(TRIG_BACK, OUTPUT);
-  pinMode(ECHO_BACK, INPUT);
+    pinMode(TRIG_FRONT, OUTPUT);
+    pinMode(ECHO_FRONT, INPUT);
+    pinMode(TRIG_BACK, OUTPUT);
+    pinMode(ECHO_BACK, INPUT);
+    pinMode(TRIG_LEFT, OUTPUT);
+    pinMode(ECHO_LEFT, INPUT);
+    pinMode(TRIG_RIGHT, OUTPUT);
+    pinMode(ECHO_RIGHT, INPUT);
 
-  stopMotors();
-  forward();
+    stopMotors();
+    forward();
 }
 
 void loop() {
-  // Reconnect to WiFi if it gets disconnected.
-  if (WiFi.status() != WL_CONNECTED) {
-      connectWifi();
-  }
-  
-  // Connect if MQTT client is not connected and resubscribe to channel updates.
-  if (!mqttClient.connected()) {
-     mqttConnect(); 
-     mqttSubscribe( channelID );
-  }
-  
-  // Call the loop to maintain connection to the server.
-  mqttClient.loop(); 
+    // Reconnect to WiFi if it gets disconnected.
+    if (WiFi.status() != WL_CONNECTED) {
+        connectWifi();
+    }
 
-  int distanceFront = getDistance(TRIG_FRONT, ECHO_FRONT);
+    // Connect if MQTT client is not connected and resubscribe to channel updates.
+    if (!mqttClient.connected()) {
+        mqttConnect(); 
+        mqttSubscribe( channelID );
+    }
+
+    // Call the loop to maintain connection to the server.
+    mqttClient.loop(); 
+
+    int distanceFront = getDistance(TRIG_FRONT, ECHO_FRONT);
     int distanceBack = getDistance(TRIG_BACK, ECHO_BACK);
+    int distanceLeft = getDistance(TRIG_LEFT, ECHO_LEFT);
+    int distanceRight = getDistance(TRIG_RIGHT, ECHO_RIGHT);
 
     Serial.print("Front: ");
     Serial.print(distanceFront);
     Serial.print(" Back: ");
     Serial.println(distanceBack);
+    Serial.print("Left: ");
+    Serial.print(distanceLeft);
+    Serial.print(" Right: ");
+    Serial.println(distanceRight);
     Serial.println();
     
     if (flag == 0) {
