@@ -5,7 +5,7 @@
 #include <ArduinoJson.h>
 
 #define GRID_SIZE 101
-int grid[GRID_SIZE][GRID_SIZE];
+int grid[GRID_SIZE][GRID_SIZE]; // assuming center is 50, 50
 #define UNTRAVELLED -1
 #define FREEPATH 0 
 #define OBSTACLE 1 
