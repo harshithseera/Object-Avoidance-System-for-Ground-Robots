@@ -4,6 +4,25 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
+#define GRID_SIZE 101
+int grid[GRID_SIZE][GRID_SIZE];
+#define UNTRAVELLED -1
+#define FREEPATH 0 
+#define OBSTACLE 1 
+
+int mapToGrid(int coord) {
+    return coord + 50;
+}
+
+void updateGrid(float x, float y, int value) {
+    int gridX = mapToGrid(x);
+    int gridY = mapToGrid(y);
+
+    if (gridX >= 0 && gridX < GRID_SIZE && gridY >= 0 && gridY < GRID_SIZE) {
+        grid[gridX][gridY] = value;
+    }
+}
+
 #define TRIG_FRONT 25
 #define ECHO_FRONT 26
 #define TRIG_BACK 32
@@ -37,10 +56,10 @@ int dir = 1;
 float x_position = 0.0;
 float y_position = 0.0;
 int orientation = 0; 
-// 0 = Right
-// 90 = Up
-// 180 = Left
-// 270 = Down
+#define RIGHT 0 
+#define UP 90
+#define LEFT 180
+#define DOWN 270
 
 
 void IRAM_ATTR update_encoder_left() {
@@ -122,24 +141,24 @@ int getDistance(int trigPin, int echoPin) {
 }
 
 void updatePosition(int movementType) {
-    flaot distancePerRotation = 1.0;
+    float distancePerRotation = 1.0;
     float distance = distancePerRotation * leftMotor.EncoderValue;
 
     switch (orientation)
     {
-    case 0:
+    case RIGHT:
         x_position += (movementType == 1) ? distance : -distance;
         break;
     
-    case 90:    
+    case UP:    
         y_position += (movementType == 1) ? distance : -distance;
         break;
     
-    case 180:
+    case LEFT:
         x_position -= (movementType == 1) ? distance : -distance;
         break;
 
-    case 270:    
+    case DOWN:    
         y_position -= (movementType == 1) ? distance : -distance;
         break;
     }
@@ -148,7 +167,7 @@ void updatePosition(int movementType) {
 }
 
 void turnLeft() {
-    orientation = (orientation + 90) % 360;
+    orientation = (orientation + UP) % 360;
     int targetLeft = leftMotor.EncoderValue - 30;
     int targetRight = rightMotor.EncoderValue + 30;
 
@@ -168,7 +187,7 @@ void turnLeft() {
 }
 
 void turnRight() {
-    orientation = (orientation + 270) % 360;
+    orientation = (orientation + DOWN) % 360;
     int targetLeft = leftMotor.EncoderValue + 30;
     int targetRight = rightMotor.EncoderValue - 30;
 
@@ -408,6 +427,11 @@ void setup() {
 
     stopMotors();
     forward();
+    for (int i = 0; i < GRID_SIZE; i++) {
+        for (int j = 0; j < GRID_SIZE; j++) {
+            grid[i][j] = UNTRAVELLED;
+        }
+    }
 }
 
 void loop() {
@@ -439,13 +463,39 @@ void loop() {
     Serial.print(" Right: ");
     Serial.println(distanceRight);
     Serial.println();
+
+    float obstacle_x = 0.0;
+    float obstacle_y = 0.0;
+    updateGrid(x_position, y_position, FREEPATH);
     
     if (flag == 0) {
         if (distanceFront > DETECT) {
             forward();
+            updatePosition(1);
         } else {
+            switch(orientation) {
+                case RIGHT:
+                    obstacle_x = x_position + distanceFront;
+                    obstacle_y = y_position;
+                    break;
+                case UP:
+                    obstacle_x = x_position;
+                    obstacle_y = y_position + distanceFront;
+                    break;
+                case LEFT:
+                    obstacle_x = x_position - distanceFront;
+                    obstacle_y = y_position;
+                    break;
+                case DOWN:
+                    obstacle_x = x_position;
+                    obstacle_y = y_position - distanceFront;
+                    break;
+            }
+            updateGrid(obstacle_x, obstacle_y, OBSTACLE);
             mqttPublish( channelID, "field1=" + String(x_position) );
             mqttPublish( channelID, "field2=" + String(y_position) );
+            mqttPublish( channelID, "field3=" + String(obstacle_x) );
+            mqttPublish( channelID, "field4=" + String(obstacle_y) );
             stopMotors();
             turnLeft();
             flag = 1;
@@ -454,9 +504,31 @@ void loop() {
         if (distanceFront > DETECT) {
             forward();
             flag = 0;
+            updatePosition(1);
         } else {
+            switch(orientation) {
+                case RIGHT:
+                    obstacle_x = x_position + distanceFront;
+                    obstacle_y = y_position;
+                    break;
+                case UP:
+                    obstacle_x = x_position;
+                    obstacle_y = y_position + distanceFront;
+                    break;
+                case LEFT:
+                    obstacle_x = x_position - distanceFront;
+                    obstacle_y = y_position;
+                    break;
+                case DOWN:
+                    obstacle_x = x_position;
+                    obstacle_y = y_position - distanceFront;
+                    break;
+            }
+            updateGrid(obstacle_x, obstacle_y, OBSTACLE);
             mqttPublish( channelID, "field1=" + String(x_position) );
             mqttPublish( channelID, "field2=" + String(y_position) );
+            mqttPublish( channelID, "field3=" + String(obstacle_x) );
+            mqttPublish( channelID, "field4=" + String(obstacle_y) );
             stopMotors();
             turnLeft();
             flag = 2;
@@ -464,9 +536,31 @@ void loop() {
     } else if (flag == 2) {
         if (distanceBack > DETECT) {
             backward();
+            updatePosition(-1);
         } else {
+            switch(orientation) {
+                case RIGHT:
+                    obstacle_x = x_position - distanceBack;
+                    obstacle_y = y_position;
+                    break;
+                case UP:
+                    obstacle_x = x_position;
+                    obstacle_y = y_position - distanceBack;
+                    break;
+                case LEFT:
+                    obstacle_x = x_position + distanceBack;
+                    obstacle_y = y_position;
+                    break;
+                case DOWN:
+                    obstacle_x = x_position;
+                    obstacle_y = y_position + distanceBack;
+                    break;
+            }
+            updateGrid(obstacle_x, obstacle_y, OBSTACLE);
             mqttPublish( channelID, "field1=" + String(x_position) );
             mqttPublish( channelID, "field2=" + String(y_position) );
+            mqttPublish( channelID, "field3=" + String(obstacle_x) );
+            mqttPublish( channelID, "field4=" + String(obstacle_y) );
             stopMotors();
             turnRight();
             flag = 3;
@@ -475,9 +569,31 @@ void loop() {
         if (distanceBack > DETECT) {
             backward();
             flag = 2;
+            updatePosition(-1);
         } else {
+            switch(orientation) {
+                case RIGHT:
+                    obstacle_x = x_position - distanceBack;
+                    obstacle_y = y_position;
+                    break;
+                case UP:
+                    obstacle_x = x_position;
+                    obstacle_y = y_position - distanceBack;
+                    break;
+                case LEFT:
+                    obstacle_x = x_position + distanceBack;
+                    obstacle_y = y_position;
+                    break;
+                case DOWN:
+                    obstacle_x = x_position;
+                    obstacle_y = y_position + distanceBack;
+                    break;
+            }
+            updateGrid(obstacle_x, obstacle_y, OBSTACLE);
             mqttPublish( channelID, "field1=" + String(x_position) );
             mqttPublish( channelID, "field2=" + String(y_position) );
+            mqttPublish( channelID, "field3=" + String(obstacle_x) );
+            mqttPublish( channelID, "field4=" + String(obstacle_y) );
             stopMotors();
             turnRight();
             flag = 0;
