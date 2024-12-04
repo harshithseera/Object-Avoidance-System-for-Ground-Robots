@@ -509,6 +509,110 @@ void loop() {
     Serial.println(distanceRight);
     Serial.println();
 
+    if (distanceFront <= DETECT) {
+        int obstacleX, obstacleY;
+        switch (orientation)
+        {
+        case RIGHT:
+            obstacleX = x_position + 1;
+            obstacleY = y_position;
+            break;
+        case LEFT:
+            obstacleX = x_position - 1;
+            obstacleY = y_position;
+            break;
+        case UP:
+            obstacleX = x_position;
+            obstacleY = y_position + 1;
+            break;
+        case DOWN:
+            obstacleX = x_position;
+            obstacleY = y_position - 1;
+            break;
+        }
+        mqttPublish(channelID, "field3=" + String(obstacleX));
+        mqttPublish(channelID, "field4=" + String(obstacleY));
+        updateGrid(obstacleX, obstacleY, OBSTACLE);
+    }
+
+    if (distanceBack <= DETECT)  {
+        int obstacleX, obstacleY;
+        switch (orientation)
+        {
+        case RIGHT:
+            obstacleX = x_position - 1;
+            obstacleY = y_position;
+            break;
+        case LEFT:
+            obstacleX = x_position + 1;
+            obstacleY = y_position;
+            break;
+        case UP:
+            obstacleX = x_position;
+            obstacleY = y_position - 1;
+            break;
+        case DOWN:
+            obstacleX = x_position;
+            obstacleY = y_position + 1;
+            break;
+        }
+        mqttPublish(channelID, "field3=" + String(obstacleX));
+        mqttPublish(channelID, "field4=" + String(obstacleY));
+        updateGrid(obstacleX, obstacleY, OBSTACLE);
+    }
+
+    if (distanceLeft <= DETECT) {
+        int obstacleX, obstacleY;
+        switch (orientation)
+        {
+        case RIGHT:
+            obstacleX = x_position;
+            obstacleY = y_position + 1;
+            break;
+        case LEFT:
+            obstacleX = x_position;
+            obstacleY = y_position - 1;
+            break;
+        case UP:
+            obstacleX = x_position - 1;
+            obstacleY = y_position;
+            break;
+        case DOWN:
+            obstacleX = x_position + 1;
+            obstacleY = y_position;
+            break;
+        }
+        mqttPublish(channelID, "field3=" + String(obstacleX));
+        mqttPublish(channelID, "field4=" + String(obstacleY));
+        updateGrid(obstacleX, obstacleY, OBSTACLE);
+    }
+
+    if (distanceRight <= DETECT) {
+        int obstacleX, obstacleY;
+        switch (orientation)
+        {
+        case RIGHT:
+            obstacleX = x_position;
+            obstacleY = y_position - 1;
+            break;
+        case LEFT:
+            obstacleX = x_position;
+            obstacleY = y_position + 1;
+            break;
+        case UP:
+            obstacleX = x_position + 1;
+            obstacleY = y_position;
+            break;
+        case DOWN:
+            obstacleX = x_position - 1;
+            obstacleY = y_position;
+            break;
+        }
+        mqttPublish(channelID, "field3=" + String(obstacleX));
+        mqttPublish(channelID, "field4=" + String(obstacleY));
+        updateGrid(obstacleX, obstacleY, OBSTACLE);
+    }
+
     // Find the direction with the maximum distance
     int maxDistance = distanceFront;
     int desiredOrientation = orientation; // Default to current orientation
