@@ -1,7 +1,7 @@
 % MATLAB Visualization for x-y Scatter Plot
 
 % Retrieve data from ThingSpeak channel
-readChannelID = 2506706; % Replace with your channel ID
+readChannelID = 2749278; % Replace with your channel ID
 xFieldID = 1; % Field 1 for x-coordinate
 yFieldID = 2; % Field 2 for y-coordinate
 numPoints = 8000; % Number of data points to retrieve
