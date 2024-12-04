@@ -25,14 +25,14 @@ void updateGrid(float x, float y, int value) {
     }
 }
 
-#define TRIG_FRONT 25
-#define ECHO_FRONT 26
-#define TRIG_BACK 32
-#define ECHO_BACK 33
-#define TRIG_LEFT 12
-#define ECHO_LEFT 13
-#define TRIG_RIGHT 34
-#define ECHO_RIGHT 35
+#define TRIG_FRONT 26
+#define ECHO_FRONT 14
+#define TRIG_BACK 33
+#define ECHO_BACK 35
+#define TRIG_LEFT 25
+#define ECHO_LEFT 27
+#define TRIG_RIGHT 32
+#define ECHO_RIGHT 34
 
 #define MAX_DISTANCE 200
 #define DETECT 10
