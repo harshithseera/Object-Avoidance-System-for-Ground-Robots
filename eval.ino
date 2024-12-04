@@ -59,6 +59,45 @@ void stopRight() {
     digitalWrite(rightMotor.BackwardPin, LOW);
 }
 
+float robotX = 0.0;
+float robotY = 0.0;
+
+void calculateAndPublishCoordinates(int distanceFront, int distanceLeft, int distanceRight) {
+    float frontX = distanceFront != MAX_DISTANCE ? robotX + distanceFront : -1;
+    float frontY = distanceFront != MAX_DISTANCE ? robotY : -1;
+
+    float leftX = distanceLeft != MAX_DISTANCE ? robotX : -1;
+    float leftY = distanceLeft != MAX_DISTANCE ? robotY + distanceLeft : -1;
+
+    float rightX = distanceRight != MAX_DISTANCE ? robotX : -1;
+    float rightY = distanceRight != MAX_DISTANCE ? robotY - distanceRight : -1;
+
+    mqttPublish(channelID, "field3=" + String(frontX));
+    mqttPublish(channelID, "field4=" + String(frontY));
+    mqttPublish(channelID, "field3=" + String(leftX));
+    mqttPublish(channelID, "field4=" + String(leftY));
+    mqttPublish(channelID, "field3=" + String(rightX));
+    mqttPublish(channelID, "field4=" + String(rightY));
+
+    Serial.print("Obstacle Front: (");
+    Serial.print(frontX);
+    Serial.print(", ");
+    Serial.print(frontY);
+    Serial.println(")");
+
+    Serial.print("Obstacle Left: (");
+    Serial.print(leftX);
+    Serial.print(", ");
+    Serial.print(leftY);
+    Serial.println(")");
+
+    Serial.print("Obstacle Right: (");
+    Serial.print(rightX);
+    Serial.print(", ");
+    Serial.print(rightY);
+    Serial.println(")");
+}
+
 void forward() {
     digitalWrite(leftMotor.ForwardPin, HIGH);
     digitalWrite(leftMotor.BackwardPin, LOW);
@@ -106,13 +145,13 @@ void turnRight() {
     stopLeft(); // Stop left motor after turn
 }
 
-char ssid[] = "seera";
-char pass[] = "afwd3291";
+char ssid[] = "Disha";
+char pass[] = "svkl2978";
 
-#define channelID 2506706 //should not be a string, just an int
-const char mqttUserName[] = "CSodJDMlGCIHKA8LJB8JES0"; 
-const char clientID[] = "CSodJDMlGCIHKA8LJB8JES0";
-const char mqttPass[] = "uAbYatwOcDfR28N+7S4Wnp10";
+#define channelID 2749278 //should not be a string, just an int
+const char mqttUserName[] = "BjQdLBkbKR4PGy4IIywhJAU"; 
+const char clientID[] = "BjQdLBkbKR4PGy4IIywhJAU";
+const char mqttPass[] = "Fxgqhx4QvdcrjxFmazTlKanN";
 
 const char * PROGMEM thingspeak_ca_cert = \
 "-----BEGIN CERTIFICATE-----\n" \
@@ -313,6 +352,14 @@ void setup() {
     Serial.begin(115200);
 
     stopMotors();
+
+    int distanceFront = getDistance(TRIG_FRONT, ECHO_FRONT);
+    mqttPublish(channelID, "field5=" + String(distanceFront));
+    int distanceLeft = getDistance(TRIG_LEFT, ECHO_LEFT);
+    mqttPublish(channelID, "field6=" + String(distanceLeft));
+    int distanceRight = getDistance(TRIG_RIGHT, ECHO_RIGHT);
+    mqttPublish(channelID, "field7=" + String(distanceRight));
+    calculateAndPublishCoordinates(distanceFront, distanceLeft, distanceRight);
     forward();
 }
 
