@@ -231,10 +231,10 @@ char ssid[] = "seera";
 char pass[] = "afwd3291";
 
 // Ensure that the credentials here allow you to publish and subscribe to the ThingSpeak channel.
-#define channelID 2506706 //should not be a string, just an int
-const char mqttUserName[] = "CSodJDMlGCIHKA8LJB8JES0"; 
-const char clientID[] = "CSodJDMlGCIHKA8LJB8JES0";
-const char mqttPass[] = "uAbYatwOcDfR28N+7S4Wnp10";
+#define channelID 2749278 //should not be a string, just an int
+const char mqttUserName[] = "BjQdLBkbKR4PGy4IIywhJAU"; 
+const char clientID[] = "BjQdLBkbKR4PGy4IIywhJAU";
+const char mqttPass[] = "Fxgqhx4QvdcrjxFmazTlKanN";
 
 const char * PROGMEM thingspeak_ca_cert = \
 "-----BEGIN CERTIFICATE-----\n" \
