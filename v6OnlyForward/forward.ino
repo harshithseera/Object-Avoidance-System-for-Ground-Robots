@@ -168,6 +168,8 @@ void updatePosition(int movementType) {
     rightMotor.EncoderValue = 0;
 }
 
+int flag = 0;
+
 void turnLeft() {
     orientation = (orientation + 90) % 360;
     int targetLeft = leftMotor.EncoderValue - 30;
@@ -194,6 +196,12 @@ void turnRight() {
     }
 }
 
+void backward() {
+    turnLeft();
+    turnLeft();
+    forward();
+}
+
 int flag = 0;
 
 void loop() {
@@ -217,7 +225,42 @@ void loop() {
     Serial.print("Right Encoder: ");
     Serial.println(rightMotor.EncoderValue);
     Serial.println();
-    forward();
+    
+    if (flag == 0) {
+        if (distanceFront > DETECT) {
+            forward();
+        } else {
+            stopMotors();
+            turnLeft();
+            flag = 1;
+        }
+    } else if (flag == 1) {
+        if (distanceFront > DETECT) {
+            forward();
+            flag = 0;
+        } else {
+            stopMotors();
+            turnLeft();
+            flag = 2;
+        }
+    } else if (flag == 2) {
+        if (distanceBack > DETECT) {
+            backward();
+        } else {
+            stopMotors();
+            turnRight();
+            flag = 3;
+        }
+    } else if (flag == 3) {
+        if (distanceBack > DETECT) {
+            backward();
+            flag = 2;
+        } else {
+            stopMotors();
+            turnRight();
+            flag = 0;
+        }
+    }
 
     delay(1000);
 }
