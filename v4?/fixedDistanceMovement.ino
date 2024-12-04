@@ -10,7 +10,7 @@ int grid[GRID_SIZE][GRID_SIZE]; // assuming center is 50, 50
 #define FREEPATH 0 
 #define OBSTACLE 1 
 
-#define MOVEMENT_UNIT 20
+#define MOVEMENT_UNIT 10
 
 int mapToGrid(int coord) {
     return coord + 50;
