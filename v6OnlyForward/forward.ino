@@ -78,15 +78,6 @@ void forward() {
     analogWrite(leftMotor.EnablePin, MOVING_SPEED);
 }
 
-void backward() {
-    digitalWrite(rightMotor.ForwardPin, LOW);
-    digitalWrite(rightMotor.BackwardPin, HIGH);
-    analogWrite(rightMotor.EnablePin, MOVING_SPEED);
-    digitalWrite(leftMotor.ForwardPin, LOW);
-    digitalWrite(leftMotor.BackwardPin, HIGH);
-    analogWrite(leftMotor.EnablePin, MOVING_SPEED);
-}
-
 void stopMotors() {
     for(int i = 255; i > 0; i--) {
         analogWrite(leftMotor.EnablePin, i);
@@ -167,8 +158,6 @@ void updatePosition(int movementType) {
     leftMotor.EncoderValue = 0;
     rightMotor.EncoderValue = 0;
 }
-
-int flag = 0;
 
 void turnLeft() {
     orientation = (orientation + 90) % 360;
