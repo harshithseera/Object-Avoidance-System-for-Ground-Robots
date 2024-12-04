@@ -52,10 +52,10 @@ void IRAM_ATTR update_encoder_right() {
 }
 
 void initialize_motors() {
-    leftMotor.EncoderPinA = 16; //C1
+    leftMotor.EncoderPinA = 13; //C1
     leftMotor.EncoderPinB = 4; //C2
     leftMotor.ForwardPin = 22;
-    leftMotor.BackwardPin = 17;
+    leftMotor.BackwardPin = 12;
     leftMotor.EnablePin = 23;
     leftMotor.EncoderValue = 0;
     attachInterrupt(digitalPinToInterrupt(leftMotor.EncoderPinA), update_encoder_left, RISING);
