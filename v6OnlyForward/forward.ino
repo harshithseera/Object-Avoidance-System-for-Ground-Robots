@@ -160,34 +160,34 @@ void updatePosition(int movementType) {
 }
 
 void turnLeft() {
-    orientation = (orientation + 90) % 360;
-    int targetLeft = leftMotor.EncoderValue - 30;
-    int targetRight = rightMotor.EncoderValue + 30;
+    for (int i = 0; i < 3; i++) {
+        turnRight();
+    }
+}
 
-    digitalWrite(leftMotor.ForwardPin, LOW);
-    digitalWrite(leftMotor.BackwardPin, HIGH);
+void turnRight() {
+    orientation = (orientation + 270) % 360;
+    int targetLeft = leftMotor.EncoderValue + 30;
+    int targetRight = rightMotor.EncoderValue - 30;
+
+    digitalWrite(leftMotor.ForwardPin, HIGH);
+    digitalWrite(leftMotor.BackwardPin, LOW);
     analogWrite(leftMotor.EnablePin, TURNING_SPEED);
     
-    digitalWrite(rightMotor.ForwardPin, HIGH);
-    digitalWrite(rightMotor.BackwardPin, LOW);
+    digitalWrite(rightMotor.ForwardPin, LOW);
+    digitalWrite(rightMotor.BackwardPin, HIGH);
     analogWrite(rightMotor.EnablePin, TURNING_SPEED);
     
-    while (leftMotor.EncoderValue > targetLeft && rightMotor.EncoderValue < targetRight) {
+    while (leftMotor.EncoderValue < targetLeft && rightMotor.EncoderValue > targetRight) {
         delay(10);
     }
 
     stopMotors();
 }
 
-void turnRight() {
-    for (int i = 0; i < 3; i++) {
-        turnLeft();
-    }
-}
-
 void backward() {
-    turnLeft();
-    turnLeft();
+    turnRight();
+    turnRight();
     forward();
 }
 
